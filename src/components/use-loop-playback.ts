@@ -2,72 +2,100 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getChord } from "@/lib/music";
-import type { PianoAudio } from "@/lib/audio";
+import { LoopTransport, type LoopSettings } from "@/lib/loop-transport";
 import { useStudio } from "./studio-provider";
 
 export function useLoopPlayback() {
-  const { progression, tempo, getAudio } = useStudio();
-  const [playing, setPlaying] = useState(false);
+  const { progression, tempo, getAudio, hear } = useStudio();
+  const [session, setSession] = useState<LoopTransport | null>(null);
+  const playing = session !== null;
   const [starting, setStarting] = useState(false);
-  const [position, setPosition] = useState(0);
-  const audio = useRef<PianoAudio | null>(null);
+  const [playback, setPlayback] = useState({ position: 0, notes: [] as string[], tempo });
+  const transport = useRef<LoopTransport | null>(null);
+  const settings = useRef<LoopSettings>({ tempo, chords: progression.map((id) => getChord(id).notes) });
+  const request = useRef(0);
+  const pending = useRef(false);
   const mounted = useRef(false);
+  const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const frame = useRef<number | undefined>(undefined);
+
+  const clearTimers = useCallback(() => {
+    clearInterval(timer.current);
+    if (frame.current !== undefined) cancelAnimationFrame(frame.current);
+    timer.current = undefined;
+    frame.current = undefined;
+  }, []);
+
+  const invalidateRequest = useCallback(() => {
+    ++request.current;
+    pending.current = false;
+  }, []);
+
+  const stop = useCallback(() => {
+    invalidateRequest();
+    clearTimers();
+    transport.current?.stop();
+    transport.current = null;
+    setSession(null);
+    setStarting(false);
+  }, [clearTimers, invalidateRequest]);
 
   useEffect(() => {
     mounted.current = true;
-    return () => { mounted.current = false; };
-  }, []);
-
-  const toggle = useCallback(async () => {
-    if (playing) {
-      audio.current?.stop();
-      setPlaying(false);
-      return;
-    }
-    setStarting(true);
-    const instrument = await getAudio();
-    if (!mounted.current) return;
-    audio.current = instrument;
-    setPosition(0);
-    setStarting(false);
-    if (instrument) setPlaying(true);
-  }, [playing, getAudio]);
+    function onVisibility() { if (document.hidden) stop(); }
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", stop);
+    return () => {
+      mounted.current = false;
+      invalidateRequest();
+      clearTimers();
+      transport.current?.stop();
+      transport.current = null;
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", stop);
+    };
+  }, [clearTimers, stop, invalidateRequest]);
 
   useEffect(() => {
-    if (!playing || !audio.current) return;
-    const instrument = audio.current;
-    const barDuration = (60 / tempo) * 4;
-    const start = instrument.context.currentTime + 0.04;
-    let nextBar = 0;
-    let nextTime = start;
-    let frame = 0;
+    settings.current = { tempo, chords: progression.map((id) => getChord(id).notes) };
+    transport.current?.update(settings.current);
+  }, [tempo, progression]);
 
-    function schedule() {
-      while (nextTime < instrument.context.currentTime + 0.15) {
-        instrument.play(getChord(progression[nextBar % 4]).notes, nextTime, barDuration * 0.92);
-        nextBar++;
-        nextTime += barDuration;
-      }
-    }
+  const start = useCallback(async () => {
+    if (pending.current || transport.current) return;
+    const id = ++request.current;
+    pending.current = true;
+    setStarting(true);
+    void hear([]);
+    const instrument = await getAudio();
+    if (!mounted.current || request.current !== id) return;
+    pending.current = false;
+    setStarting(false);
+    if (!instrument) return;
+    const loop = new LoopTransport(instrument, settings.current);
+    loop.start();
+    transport.current = loop;
+    setPlayback(loop.getPlayback());
+    setSession(loop);
+  }, [getAudio, hear]);
+
+  useEffect(() => {
+    if (!session) return;
     function animate() {
-      setPosition(Math.max(0, (instrument.context.currentTime - start) / barDuration) % 4);
-      frame = requestAnimationFrame(animate);
+      const loop = transport.current;
+      if (!loop || loop !== session) return;
+      setPlayback(loop.getPlayback());
+      frame.current = requestAnimationFrame(animate);
     }
-    function onVisibility() {
-      if (document.hidden) setPlaying(false);
-    }
+    timer.current = setInterval(() => { if (transport.current === session) session.schedule(); }, 25);
+    frame.current = requestAnimationFrame(animate);
+    return clearTimers;
+  }, [session, clearTimers]);
 
-    schedule();
-    frame = requestAnimationFrame(animate);
-    const timer = window.setInterval(schedule, 25);
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.clearInterval(timer);
-      cancelAnimationFrame(frame);
-      document.removeEventListener("visibilitychange", onVisibility);
-      instrument.stop();
-    };
-  }, [playing, progression, tempo]);
-
-  return { playing, starting, position: playing ? position : 0, toggle };
+  return {
+    playing, starting, start, stop,
+    position: playing ? playback.position : 0,
+    activeNotes: playing ? playback.notes : [],
+    appliedTempo: playing ? playback.tempo : tempo,
+  };
 }
