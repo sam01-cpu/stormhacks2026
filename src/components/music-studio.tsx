@@ -7,6 +7,7 @@ import { useStudio } from "./studio-provider";
 import { useLoopPlayback } from "./use-loop-playback";
 import { Piano } from "./piano";
 import { ChordFeedback } from "./chord-feedback";
+import { GuidedLesson } from "./guided-lesson";
 
 type Stage = "keys" | "chords" | "loop";
 const steps: { id: Stage; label: string; href: string }[] = [
@@ -29,21 +30,21 @@ function PlayIcon({ stop = false }: { stop?: boolean }) {
 }
 
 function KeysLesson() {
-  const { setSelectedNotes, hear } = useStudio();
+  const { setSelectedNotes, hear, guideStep } = useStudio();
   return (
     <div className="keys-lesson">
       <ChordFeedback />
-      <button className="secondary-button" onClick={() => { setSelectedNotes(["C", "E", "G"]); void hear(["C", "E", "G"]); }}><PlayIcon />Try C + E + G</button>
+      <button className="secondary-button" onClick={() => { setSelectedNotes(guideStep === 1 ? [] : ["C", "E", "G"]); void hear(["C", "E", "G"]); }}><PlayIcon />Hear C major</button>
     </div>
   );
 }
 
 function ProgressionBuilder() {
-  const { progression, setProgression, setSelectedNotes, hear } = useStudio();
+  const { progression, setProgression, setSelectedNotes, hear, advanceGuide } = useStudio();
   return (
     <section className="progression-section" aria-labelledby="progression-title">
       <div className="section-heading"><h2 id="progression-title">Your progression</h2><span>4 bars · C major</span></div>
-      <p className="builder-hint">A bar is four beats. Choose a chord to hear it, or press Hear to listen again.</p>
+      <p className="builder-hint">Every chord here uses C D E F G A B. Choose one to hear its notes, or press Hear again.</p>
       <div className="bar-list">
         {progression.map((id, index) => {
           const chord = getChord(id);
@@ -55,6 +56,7 @@ function ProgressionBuilder() {
                 setProgression(progression.map((old, bar) => bar === index ? next.id : old));
                 setSelectedNotes(next.notes);
                 void hear(next.notes);
+                advanceGuide(4);
               }}>{chords.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}</select>
               <div className="bar-bottom"><span className="bar-note-summary"><small>Notes</small><span>{chord.notes.join(" · ")}</span></span><button type="button" className="audition-button" aria-label={`Hear bar ${index + 1}: ${chord.name}`} onClick={() => { setSelectedNotes(chord.notes); void hear(chord.notes); }}><PlayIcon /><span>Hear</span></button></div>
             </div>
@@ -91,7 +93,8 @@ export function MusicStudio({ stage }: { stage: Stage }) {
       <main className={`studio stage-${stage}`}>
         <nav className="step-nav" aria-label="Learning steps">{steps.map((step, index) => <Link key={step.id} href={step.href} className={`step-link${stage === step.id ? " is-current" : ""}`} aria-current={stage === step.id ? "step" : undefined}><span className="step-number">0{index + 1}</span><span>{step.label}</span></Link>)}</nav>
         <div className="stage-content" key={stage}>
-          <div className="stage-heading"><span className="eyebrow">STEP 0{stepIndex + 1} / 03</span><h1>{copy[stage].title}</h1><p>{copy[stage].intro}</p></div>
+          <div className="stage-heading"><span className="eyebrow">STEP 0{stepIndex + 1} / 03</span><h1>{copy[stage].title}</h1></div>
+          <GuidedLesson stage={stage} playing={playing} />
           <Piano activeNotes={activeNotes} />
           {error && <p className="audio-error" role="alert">{error}</p>}
           {stage === "keys" && <KeysLesson />}

@@ -8,7 +8,7 @@ const bindings: Record<string, string> = { KeyA: "C", KeyW: "C#", KeyS: "D", Key
 const keyLabels = Object.fromEntries(Object.entries(bindings).map(([code, note]) => [note, code.slice(3)]));
 
 export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
-  const { selectedNotes, setSelectedNotes, hear, startNote } = useStudio();
+  const { selectedNotes, setSelectedNotes, hear, startNote, recordPianoPractice } = useStudio();
   const sources = useRef(new Map<string, string>());
   const heldNotes = useRef(new Map<string, { release?: () => void }>());
 
@@ -29,7 +29,9 @@ export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
   const hold = useCallback((source: string, note: string) => {
     if (sources.current.has(source)) return;
     sources.current.set(source, note);
-    setSelectedNotes([...new Set(sources.current.values())]);
+    const notes = [...new Set(sources.current.values())];
+    setSelectedNotes(notes);
+    recordPianoPractice(notes);
     if (heldNotes.current.has(note)) return;
     const held: { release?: () => void } = {};
     heldNotes.current.set(note, held);
@@ -38,7 +40,7 @@ export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
       if (heldNotes.current.get(note) === held) held.release = release;
       else release?.();
     });
-  }, [setSelectedNotes, startNote]);
+  }, [setSelectedNotes, startNote, recordPianoPractice]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -74,6 +76,7 @@ export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
   function select(note: string) {
     const next = selectedNotes.includes(note) ? selectedNotes : [...selectedNotes, note];
     setSelectedNotes(next);
+    recordPianoPractice(next);
     void hear(next);
   }
 

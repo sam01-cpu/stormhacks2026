@@ -6,7 +6,7 @@ import { LoopTransport, type LoopSettings } from "@/lib/loop-transport";
 import { useStudio } from "./studio-provider";
 
 export function useLoopPlayback() {
-  const { progression, tempo, getAudio, hear } = useStudio();
+  const { progression, tempo, getAudio, hear, advanceGuide } = useStudio();
   const [session, setSession] = useState<LoopTransport | null>(null);
   const playing = session !== null;
   const [starting, setStarting] = useState(false);
@@ -18,6 +18,7 @@ export function useLoopPlayback() {
   const mounted = useRef(false);
   const timer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const frame = useRef<number | undefined>(undefined);
+  const lastBar = useRef<number | null>(null);
 
   const clearTimers = useCallback(() => {
     clearInterval(timer.current);
@@ -73,6 +74,7 @@ export function useLoopPlayback() {
     setStarting(false);
     if (!instrument) return;
     const loop = new LoopTransport(instrument, settings.current);
+    lastBar.current = null;
     loop.start();
     transport.current = loop;
     setPlayback(loop.getPlayback());
@@ -84,13 +86,20 @@ export function useLoopPlayback() {
     function animate() {
       const loop = transport.current;
       if (!loop || loop !== session) return;
-      setPlayback(loop.getPlayback());
+      const current = loop.getPlayback();
+      const bar = Math.floor(current.position);
+      if (current.notes.length && bar !== lastBar.current) {
+        if (bar === 1) advanceGuide(5);
+        if (bar === 0 && lastBar.current === 3) advanceGuide(6);
+        lastBar.current = bar;
+      }
+      setPlayback(current);
       frame.current = requestAnimationFrame(animate);
     }
     timer.current = setInterval(() => { if (transport.current === session) session.schedule(); }, 25);
     frame.current = requestAnimationFrame(animate);
     return clearTimers;
-  }, [session, clearTimers]);
+  }, [session, clearTimers, advanceGuide]);
 
   return {
     playing, starting, start, stop,
