@@ -13,6 +13,7 @@ type StudioState = {
   error: string;
   getAudio: () => Promise<PianoAudio | null>;
   hear: (notes: string[]) => Promise<void>;
+  startNote: (note: string) => Promise<(() => void) | undefined>;
 };
 
 const StudioContext = createContext<StudioState | null>(null);
@@ -23,6 +24,8 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   const [tempo, setTempo] = useState(84);
   const [error, setError] = useState("");
   const audio = useRef<PianoAudio | null>(null);
+  const preview = useRef<(() => void) | undefined>(undefined);
+  const previewRequest = useRef(0);
 
   const getAudio = useCallback(async () => {
     try {
@@ -37,8 +40,18 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const hear = useCallback(async (notes: string[]) => {
+    const request = ++previewRequest.current;
+    preview.current?.();
+    if (!notes.length) return;
     const instrument = await getAudio();
-    instrument?.play(notes);
+    if (request === previewRequest.current) preview.current = instrument?.play(notes);
+  }, [getAudio]);
+
+  const startNote = useCallback(async (note: string) => {
+    ++previewRequest.current;
+    preview.current?.();
+    const instrument = await getAudio();
+    return instrument?.noteOn(note);
   }, [getAudio]);
 
   useEffect(() => () => {
@@ -47,7 +60,7 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <StudioContext.Provider value={{ selectedNotes, setSelectedNotes, progression, setProgression, tempo, setTempo, error, getAudio, hear }}>
+    <StudioContext.Provider value={{ selectedNotes, setSelectedNotes, progression, setProgression, tempo, setTempo, error, getAudio, hear, startNote }}>
       {children}
     </StudioContext.Provider>
   );

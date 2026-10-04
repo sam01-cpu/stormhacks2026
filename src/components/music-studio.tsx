@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, type CSSProperties } from "react";
-import { blackNotes, chords, getChord, recognizeChord, whiteNotes } from "@/lib/music";
+import { type CSSProperties } from "react";
+import { chords, getChord, recognizeChord, whiteNotes } from "@/lib/music";
 import { useStudio } from "./studio-provider";
 import { useLoopPlayback } from "./use-loop-playback";
+import { Piano } from "./piano";
 
 type Stage = "keys" | "chords" | "loop";
 const steps: { id: Stage; label: string; href: string }[] = [
@@ -24,53 +25,6 @@ function BrandMark() {
 
 function PlayIcon({ stop = false }: { stop?: boolean }) {
   return <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">{stop ? <rect x="5" y="5" width="10" height="10" rx="1" /> : <path d="M6 3.5 16 10 6 16.5Z" />}</svg>;
-}
-
-function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
-  const { selectedNotes, setSelectedNotes, hear } = useStudio();
-
-  function play(note: string) {
-    setSelectedNotes(selectedNotes.includes(note) ? selectedNotes.filter((selected) => selected !== note) : [...selectedNotes, note]);
-    void hear([note]);
-  }
-
-  useEffect(() => {
-    const bindings: Record<string, string> = { a: "C", w: "C#", s: "D", e: "D#", d: "E", f: "F", t: "F#", g: "G", y: "G#", h: "A", u: "A#", j: "B" };
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || (event.target instanceof HTMLElement && event.target.closest("input, select, textarea, button, a, summary, [contenteditable]"))) return;
-      const note = bindings[event.key.toLowerCase()];
-      if (note) {
-        event.preventDefault();
-        setSelectedNotes([note]);
-        void hear([note]);
-      }
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [hear, setSelectedNotes]);
-
-  const selected = (note: string) => selectedNotes.includes(note) || activeNotes.includes(note);
-  return (
-    <section className="instrument" aria-label="Interactive one-octave piano">
-      <div className="instrument-toolbar">
-        <span className="instrument-name"><span className="status-dot" />Piano</span>
-        <span className="instrument-range">C4–B4 <span> / </span> One octave</span>
-      </div>
-      <div className="keyboard">
-        <div className="white-keys">
-          {whiteNotes.map((note, index) => (
-            <button type="button" className={`white-key${selected(note) ? " is-selected" : ""}`} key={note} aria-label={`Play ${note}4`} aria-pressed={selected(note)} onClick={() => play(note)}>
-              <span>{note}</span><kbd>{["A", "S", "D", "F", "G", "H", "J"][index]}</kbd>
-            </button>
-          ))}
-        </div>
-        {blackNotes.map(({ note, after }) => (
-          <button type="button" className={`black-key${selected(note) ? " is-selected" : ""}`} key={note} style={{ left: `${((after + 1) / 7) * 100}%` }} aria-label={`Play ${note}4`} aria-pressed={selected(note)} onClick={() => play(note)}><span>{note}</span></button>
-        ))}
-      </div>
-      <div className="piano-footer"><span>Click a key or use <kbd>A</kbd>–<kbd>J</kbd></span><button className="text-button" onClick={() => setSelectedNotes([])} disabled={!selectedNotes.length}>Clear notes</button></div>
-    </section>
-  );
 }
 
 function KeysLesson() {
