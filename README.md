@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MusicCraft
 
-## Getting Started
+Learn music theory by making music: play a piano, discover chords, build a four-bar progression, and hear it loop.
 
-First, run the development server:
+## Local development
+
+Use Node.js 24 and npm.
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Checks and production preview
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+node --test tests/*.test.mjs
+npm run build
+npm run start
+```
 
-## Learn More
+## Deploy to Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Commit and push this project, including `package-lock.json` and `vercel.json`, to your Git repository.
+2. In [Vercel's new-project page](https://vercel.com/new), import the repository.
+3. Set **Root Directory** to the folder containing this `package.json`. Leave it at the repository root if this app is at the top level.
+4. Use the **Next.js** framework preset. The committed configuration sets **Install Command** to `npm ci` and **Build Command** to `npm run build`. Leave **Output Directory** at its Next.js default.
+5. Click **Deploy**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`package.json` selects Node.js **24.x** for deployment. No environment variables, API keys, database, or separate audio server are required. The piano synthesizes audio in the browser after the user clicks or presses a key.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Check `/`, `/chords`, and `/loop` on the deployed URL. Play some notes, edit a chord, then start and stop the loop. Subsequent pushes to the connected production branch will trigger new deployments.
 
-## Deploy on Vercel
+For an optional command-line deployment, run `npx vercel` from this directory, follow the project-linking prompts, and use `npx vercel --prod` to publish to production.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [Next.js on Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs), [Vercel configuration](https://vercel.com/docs/project-configuration/vercel-json), and [Node.js version selection](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
