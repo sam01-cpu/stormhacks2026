@@ -21,11 +21,34 @@ export function getChord(id: string) {
   return chords.find((chord) => chord.id === id) ?? chords[0];
 }
 
+const pitchNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const triadPatterns = [
+  { quality: "major", intervals: [0, 4, 7], sound: "bright, settled" },
+  { quality: "minor", intervals: [0, 3, 7], sound: "softer, darker" },
+  { quality: "diminished", intervals: [0, 3, 6], sound: "tense, unsettled" },
+] as const;
+
 export function recognizeChord(notes: string[]) {
-  return chords.find((chord) => notes.length === chord.notes.length && chord.notes.every((note) => notes.includes(note)));
+  const selected = new Set(notes);
+  if (selected.size !== 3 || notes.some((note) => !pitchNames.includes(note))) return undefined;
+
+  for (const [rootIndex, root] of pitchNames.entries()) {
+    for (const pattern of triadPatterns) {
+      const chordNotes = pattern.intervals.map((interval) => pitchNames[(rootIndex + interval) % 12]);
+      if (chordNotes.every((note) => selected.has(note))) {
+        return {
+          name: `${root} ${pattern.quality}`,
+          root,
+          quality: pattern.quality,
+          notes: chordNotes,
+          explanation: `${root} is the root (the note that names the chord), and ${chordNotes[1]} and ${chordNotes[2]} join it to make a ${pattern.sound} sound.`,
+        };
+      }
+    }
+  }
+  return undefined;
 }
 
 export function frequency(note: string) {
-  const semitones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  return 440 * 2 ** ((60 + semitones.indexOf(note) - 69) / 12);
+  return 440 * 2 ** ((60 + pitchNames.indexOf(note) - 69) / 12);
 }

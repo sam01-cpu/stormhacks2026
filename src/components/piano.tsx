@@ -72,7 +72,7 @@ export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
   }, [hold, releaseSource, releaseAll]);
 
   function select(note: string) {
-    const next = selectedNotes.includes(note) ? selectedNotes.filter((selected) => selected !== note) : [...selectedNotes, note];
+    const next = selectedNotes.includes(note) ? selectedNotes : [...selectedNotes, note];
     setSelectedNotes(next);
     void hear(next);
   }

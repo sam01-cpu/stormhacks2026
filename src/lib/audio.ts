@@ -1,11 +1,27 @@
 import { frequency } from "./music";
 
 export class PianoAudio {
-  readonly context = new AudioContext();
+  readonly context = new AudioContext({ latencyHint: "interactive" });
   private voices = new Set<() => void>();
+  private output = this.context.createGain();
+
+  constructor() {
+    this.output.gain.value = 0.65;
+
+    // Bound the combined signal, including overlapping chords and held notes.
+    const limiter = this.context.createWaveShaper();
+    const curve = new Float32Array(4097);
+    for (let index = 0; index < curve.length; index++) {
+      const sample = (index / (curve.length - 1)) * 2 - 1;
+      curve[index] = 0.65 * Math.tanh(sample / 0.65);
+    }
+    limiter.curve = curve;
+    this.output.connect(limiter);
+    limiter.connect(this.context.destination);
+  }
 
   async ready() {
-    await this.context.resume();
+    if (this.context.state !== "running") await this.context.resume();
     if (this.context.state !== "running") throw new Error("Audio is unavailable.");
   }
 
@@ -23,7 +39,7 @@ export class PianoAudio {
     envelope.gain.setValueAtTime(0, time);
     envelope.gain.linearRampToValueAtTime(volume, time + 0.008);
     envelope.gain.exponentialRampToValueAtTime(duration !== undefined ? 0.001 : volume * 0.4, time + (duration ?? 0.3));
-    envelope.connect(this.context.destination);
+    envelope.connect(this.output);
     let remaining = 3;
     let released = false;
 

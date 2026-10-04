@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { type CSSProperties } from "react";
-import { chords, getChord, recognizeChord, whiteNotes } from "@/lib/music";
+import { chords, getChord, whiteNotes } from "@/lib/music";
 import { useStudio } from "./studio-provider";
 import { useLoopPlayback } from "./use-loop-playback";
 import { Piano } from "./piano";
+import { ChordFeedback } from "./chord-feedback";
 
 type Stage = "keys" | "chords" | "loop";
 const steps: { id: Stage; label: string; href: string }[] = [
@@ -28,15 +29,10 @@ function PlayIcon({ stop = false }: { stop?: boolean }) {
 }
 
 function KeysLesson() {
-  const { selectedNotes, setSelectedNotes, hear } = useStudio();
-  const recognized = recognizeChord(selectedNotes);
+  const { setSelectedNotes, hear } = useStudio();
   return (
     <div className="keys-lesson">
-      <div className="note-feedback" role="status">
-        <span className="eyebrow">{recognized ? "YOU FOUND A CHORD" : selectedNotes.length ? "YOUR NOTES" : "YOUR TURN"}</span>
-        <strong>{recognized?.name ?? (selectedNotes.length ? selectedNotes.join(" · ") : "Pick any key")}</strong>
-        <p>{recognized ? `${recognized.notes.join(" + ")} played together make ${recognized.name}.` : "The white keys are C, D, E, F, G, A and B. Higher notes sound higher in pitch."}</p>
-      </div>
+      <ChordFeedback />
       <button className="secondary-button" onClick={() => { setSelectedNotes(["C", "E", "G"]); void hear(["C", "E", "G"]); }}><PlayIcon />Try C + E + G</button>
     </div>
   );
