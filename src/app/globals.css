@@ -126,10 +126,41 @@ h2 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
 .audition-button { display: inline-flex; height: 44px; flex-shrink: 0; align-items: center; justify-content: center; gap: 5px; padding: 0 10px; border: 1px solid #544265; border-radius: 6px; background: transparent; color: #d9baf5; font-size: 14px; }
 .audition-button:hover { background: #3b294c; }
 .audition-button svg { width: 16px; height: 16px; }
-.theory-details { margin-top: 20px; color: #c5b7d2; font-size: 17px; line-height: 1.65; }
-.theory-details summary { width: fit-content; color: #e2d4ee; cursor: pointer; }
-.theory-details p { max-width: 720px; margin: 14px 0 0; }
-.theory-details strong { color: #efe4f8; font-weight: 500; }
+.loop-explanation { margin-top: 24px; border: 1px solid #51405f; border-radius: 10px; background: radial-gradient(ellipse at 0 0, rgb(197 163 255 / 8%), transparent 80%), #1b1721; }
+.loop-explanation > summary { display: flex; align-items: center; gap: 14px; padding: 18px 20px; cursor: pointer; list-style: none; }
+.loop-explanation > summary::-webkit-details-marker { display: none; }
+.loop-explanation > summary:hover .explain-title { color: var(--accent); }
+.explain-icon { display: grid; width: 36px; height: 36px; flex-shrink: 0; place-items: center; border: 1px solid rgb(197 163 255 / 25%); border-radius: 7px; background: rgb(197 163 255 / 8%); color: var(--accent); }
+.explain-icon svg { width: 24px; height: 24px; }
+.explain-title { font-size: 21px; font-weight: 500; letter-spacing: -.5px; transition: color .18s; }
+.explain-context { margin-left: auto; color: #baadc8; font-size: 14px; }
+.explain-chevron { width: 20px; height: 20px; flex-shrink: 0; color: var(--accent); transition: transform .2s; }
+.loop-explanation[open] .explain-chevron { transform: rotate(180deg); }
+.explain-content { padding: 24px; border-top: 1px solid rgb(197 163 255 / 15%); animation: arrive .25s ease-out both; }
+.explain-overview h3 { margin: 12px 0 10px; color: #eee1ff; font-size: clamp(25px, 3vw, 32px); font-weight: 500; letter-spacing: -.8px; }
+.explain-overview > p { max-width: 640px; margin: 0; color: #c5b7d2; font-size: 17px; line-height: 1.6; }
+.explain-journey { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 26px 0 24px; padding: 0; list-style: none; }
+.explain-bar { min-width: 0; }
+.explain-chord { display: flex; width: 100%; flex-direction: column; gap: 12px; padding: 14px; border: 1px solid #59476a; border-radius: 6px; background: linear-gradient(135deg, rgb(197 163 255 / 10%), rgb(197 163 255 / 3%)); color: var(--foreground); text-align: left; transition: background .18s, border-color .18s, box-shadow .18s; }
+.explain-chord:hover { border-color: var(--accent); background: rgb(197 163 255 / 13%); }
+.explain-bar.is-playing .explain-chord { border-color: var(--accent); background: rgb(197 163 255 / 17%); box-shadow: 0 0 18px rgb(197 163 255 / 10%); }
+.explain-bar-number { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 6px; color: #c2afd6; font-family: var(--font-geist-mono), monospace; font-size: 11px; }
+.explain-hear { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-geist-sans), sans-serif; font-size: 12px; }
+.explain-hear svg { width: 14px; height: 14px; }
+.explain-chord-name { display: flex; align-items: baseline; gap: 10px; color: #ecdcff; font-size: 27px; font-weight: 550; line-height: 1.1; }
+.explain-chord-name small { color: #b69dcc; font-family: var(--font-geist-mono), monospace; font-size: 14px; font-weight: 400; }
+.explain-notes { color: #c2afd6; font-size: 14px; }
+.explain-role { display: block; margin-top: 14px; color: #e4d4f3; font-size: 16px; font-weight: 550; }
+.explain-bar > p { margin: 7px 0 0; color: #c1b3ce; font-size: 16px; line-height: 1.6; }
+.explain-return { display: flex; align-items: flex-start; gap: 14px; padding: 18px; border-left: 2px solid var(--accent); border-radius: 0 6px 6px 0; background: rgb(197 163 255 / 7%); }
+.explain-return > span { color: var(--accent); font-size: 30px; line-height: 1; }
+.explain-return .eyebrow { font-size: 11px; }
+.explain-return p { margin: 8px 0 0; color: #e0d0ef; font-size: 17px; line-height: 1.55; }
+.explain-numerals { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.explain-numerals p { margin: 8px 0 0; color: #bfb1cc; font-size: 15px; line-height: 1.65; }
+.explain-numerals .numeral-sequence { margin: 12px 0; color: var(--accent); font-family: var(--font-geist-mono), monospace; font-size: 20px; }
+.explain-numerals .numeral-guide { color: #ded0ee; font-family: var(--font-geist-mono), monospace; font-size: 14px; }
+.explain-listening-tip { margin: 20px 0 0; color: #baadc8; font-size: 15px; line-height: 1.65; }
 .piano-roll { display: grid; grid-template-columns: 30px minmax(0, 1fr); height: 196px; }
 .pitch-labels { display: grid; grid-template-rows: repeat(7, 1fr); padding-top: 32px; color: #c0aece; font-size: 13px; }
 .pitch-labels span { display: flex; align-items: center; }
@@ -187,5 +218,14 @@ h2 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
   .beat-readout { width: 100%; margin: 0; }
   .piano-roll { height: 194px; }
   .roll-bar-name { padding: 0 5px; font-size: 11px; }
+  .loop-explanation > summary { gap: 10px; padding: 16px; }
+  .explain-title { font-size: 19px; }
+  .explain-context { display: none; }
+  .explain-chevron { margin-left: auto; }
+  .explain-content { padding: 20px 16px; }
+  .explain-overview .eyebrow { font-size: 11px; letter-spacing: 1px; }
+  .explain-journey { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+  .explain-chord { padding: 12px; }
+  .explain-return { gap: 10px; padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

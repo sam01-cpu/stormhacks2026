@@ -8,17 +8,48 @@ export const blackNotes = [
 ];
 
 export const chords = [
-  { id: "C", name: "C major", notes: ["C", "E", "G"], feeling: "A settled sound. C major feels like home in this key." },
-  { id: "Dm", name: "D minor", notes: ["D", "F", "A"], feeling: "A softer sound that adds a little tension." },
-  { id: "Em", name: "E minor", notes: ["E", "G", "B"], feeling: "A gentle, reflective sound. It shares two notes with C major." },
-  { id: "F", name: "F major", notes: ["F", "A", "C"], feeling: "An open sound that moves away from home." },
-  { id: "G", name: "G major", notes: ["G", "B", "D"], feeling: "A sense of anticipation. Try following it with C major to hear it settle." },
-  { id: "Am", name: "A minor", notes: ["A", "C", "E"], feeling: "A darker mood, using two of the same notes as C major." },
-  { id: "Bdim", name: "B diminished", notes: ["B", "D", "F"], feeling: "An unsettled sound that pulls strongly toward C major." },
+  { id: "C", name: "C major", notes: ["C", "E", "G"], degree: 1, numeral: "I", role: "Home", feeling: "C can feel like home: a settled place to land." },
+  { id: "Dm", name: "D minor", notes: ["D", "F", "A"], degree: 2, numeral: "ii", role: "Anticipation", feeling: "Dm can bring a softer mood and gently build anticipation." },
+  { id: "Em", name: "E minor", notes: ["E", "G", "B"], degree: 3, numeral: "iii", role: "Reflection", feeling: "Em can feel reflective; it shares E and G with the home chord." },
+  { id: "F", name: "F major", notes: ["F", "A", "C"], degree: 4, numeral: "IV", role: "Away from home", feeling: "F can open things up and move the progression away from home." },
+  { id: "G", name: "G major", notes: ["G", "B", "D"], degree: 5, numeral: "V", role: "Tension", feeling: "G often builds tension that strongly wants to return to C." },
+  { id: "Am", name: "A minor", notes: ["A", "C", "E"], degree: 6, numeral: "vi", role: "A minor feeling", feeling: "Am can add a more emotional, minor feeling; it shares C and E with the home chord." },
+  { id: "Bdim", name: "B diminished", notes: ["B", "D", "F"], degree: 7, numeral: "vii°", role: "More tension", feeling: "Bdim can feel especially tense, making C sound like a place to land." },
 ];
 
 export function getChord(id: string) {
   return chords.find((chord) => chord.id === id) ?? chords[0];
+}
+
+export function explainProgression(progression: readonly string[]) {
+  // This lesson only covers four bars from the C-major chord family.
+  // Unlike playback's fallback, unknown chords must not get a made-up explanation.
+  if (progression.length !== 4 || progression.some((id) => !chords.some((chord) => chord.id === id))) return null;
+  const bars = progression.map(getChord);
+  const first = bars[0];
+  const last = bars[3];
+  let returnExplanation = `${last.id} → ${first.id}: your last chord leads back to the first, making a repeating four-bar pattern.`;
+
+  if (bars.every((chord) => chord.id === first.id)) {
+    returnExplanation = `All four bars use ${first.id}. Try changing one bar to hear a new direction.`;
+  } else if (last.id === first.id) {
+    returnExplanation = `${last.id} repeats across the loop boundary, so the restart can feel seamless.`;
+  } else if ((last.id === "G" || last.id === "Bdim") && first.id === "C") {
+    returnExplanation = `${last.id} → C: the tension at the end can settle into home when the loop repeats.`;
+  } else if (last.id === "G" && first.id === "Am") {
+    returnExplanation = "G → Am: the loop returns to a softer minor sound instead of landing on C.";
+  } else if (first.id === "C") {
+    returnExplanation = `${last.id} → C: the restart brings you back to the home chord.`;
+  }
+
+  return {
+    bars,
+    chordSequence: bars.map((chord) => chord.id).join(" → "),
+    numeralSequence: bars.map((chord) => chord.numeral).join(" → "),
+    numeralGuide: [...new Set(bars.map((chord) => `${chord.numeral} = ${chord.degree} (${chord.notes[0]})`))].join(" · "),
+    familyExplanation: "These chords belong to C major: every note comes from C D E F G A B.",
+    returnExplanation,
+  };
 }
 
 const pitchNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];

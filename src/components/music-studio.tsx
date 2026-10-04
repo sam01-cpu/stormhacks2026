@@ -8,6 +8,7 @@ import { useLoopPlayback } from "./use-loop-playback";
 import { Piano } from "./piano";
 import { ChordFeedback } from "./chord-feedback";
 import { GuidedLesson } from "./guided-lesson";
+import { LoopExplanation } from "./loop-explanation";
 
 type Stage = "keys" | "chords" | "loop";
 const steps: { id: Stage; label: string; href: string }[] = [
@@ -63,7 +64,7 @@ function ProgressionBuilder() {
           );
         })}
       </div>
-      <details className="theory-details"><summary>Why do these chords fit together?</summary><p>Every chord here uses only the white-key notes in C major. That shared set of notes helps them sound connected. A bar is a group of four beats; each chord gets one bar.</p>{progression.map((id, index) => <p key={index}><strong>Bar {index + 1} · {getChord(id).name}.</strong> {getChord(id).feeling}</p>)}</details>
+      <LoopExplanation />
     </section>
   );
 }
@@ -104,6 +105,7 @@ export function MusicStudio({ stage }: { stage: Stage }) {
             <PianoRoll playing={playing} position={position} />
             <div className="transport"><button type="button" className="primary-button" disabled={starting || playing} onClick={() => void start()}><PlayIcon />{starting ? "Starting…" : "Play Loop"}</button><button type="button" className="secondary-button" disabled={!playing && !starting} onClick={stop}><PlayIcon stop />Stop</button><label className="tempo-control" htmlFor="tempo"><span>Tempo <strong>{tempo}</strong> BPM</span><input id="tempo" type="range" min="50" max="160" value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><small>{playing && appliedTempo !== tempo ? "Applies at the next bar" : "4/4 · Four beats per bar"}</small></label><span className="beat-readout">{playing ? `Bar ${Math.floor(position) + 1} · Beat ${Math.floor((position % 1) * 4) + 1}` : "4 bars · Ready"}</span></div>
             <p className="loop-hint">Each block is a note; stacked notes play together. Change a chord above to hear it the next time that bar plays.</p>
+            <LoopExplanation activeBar={playing ? Math.floor(position) : null} />
           </section>}
           <footer className="stage-navigation">{stepIndex > 0 ? <Link className="back-link" href={steps[stepIndex - 1].href}>← {stepIndex === 1 ? "Learn the keys" : "Build a progression"}</Link> : <span className="footer-hint">No rules to memorize. Just start playing.</span>}{stepIndex < 2 ? <Link className="primary-button" href={steps[stepIndex + 1].href}>{stepIndex === 0 ? "Build a progression" : "Make it loop"}<span aria-hidden="true">→</span></Link> : <span className="footer-hint">You made music. Keep experimenting.</span>}</footer>
         </div>
