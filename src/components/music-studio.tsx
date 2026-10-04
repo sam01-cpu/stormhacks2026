@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { chords, getChord } from "@/lib/music";
 import { useStudio } from "./studio-provider";
 import { useLoopPlayback } from "./use-loop-playback";
@@ -22,8 +23,13 @@ const copy = {
   loop: { title: "Turn it into a loop.", intro: "Hear your four chords repeat. Change the tempo and play the piano over your loop." },
 };
 
-function BrandMark() {
-  return <span className="brand-mark" aria-hidden="true"><span /><span /><span /><span /></span>;
+function BrandLogo() {
+  return (
+    <>
+      <span className="brand-symbol" aria-hidden="true"><Image src="/musiccraft-logo.png" alt="" width={2000} height={2000} loading="eager" unoptimized /></span>
+      <span className="brand-wordmark" aria-hidden="true"><Image src="/musiccraft-logo.png" alt="" width={2000} height={2000} loading="eager" unoptimized /></span>
+    </>
+  );
 }
 
 function PlayIcon({ stop = false }: { stop?: boolean }) {
@@ -75,7 +81,7 @@ export function MusicStudio({ stage }: { stage: Stage }) {
 
   return (
     <div className="app-shell">
-      <header className="topbar"><Link className="brand" href="/" aria-label="MusicCraft home"><BrandMark /><span>music<span>craft</span></span></Link><span className="session-label">Your first loop</span></header>
+      <header className="topbar"><Link className="brand" href="/" aria-label="MusicCraft home"><BrandLogo /></Link></header>
       <main className={`studio stage-${stage}`}>
         <nav className="step-nav" aria-label="Learning steps">{steps.map((step, index) => <Link key={step.id} href={step.href} className={`step-link${stage === step.id ? " is-current" : ""}`} aria-current={stage === step.id ? "step" : undefined}><span className="step-number">0{index + 1}</span><span>{step.label}</span></Link>)}</nav>
         <div className="stage-content" key={stage}>

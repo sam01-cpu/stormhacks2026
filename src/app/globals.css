@@ -36,14 +36,14 @@ a { color: inherit; text-decoration: none; }
 button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 button, a { touch-action: manipulation; }
 .topbar { display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 24px; padding: 0 clamp(24px, 5vw, 72px); border-bottom: 1px solid rgb(255 255 255 / 7%); }
-.brand { display: inline-flex; align-items: center; gap: 12px; font-size: 23px; font-weight: 600; letter-spacing: -.8px; }
-.brand > span:last-child > span { color: #b5acbf; font-weight: 450; }
-.brand-mark { display: inline-flex; align-items: center; justify-content: center; gap: 3px; width: 32px; height: 32px; border: 1px solid rgb(197 163 255 / 28%); border-radius: 6px; background: rgb(197 163 255 / 5%); }
-.brand-mark span { width: 3px; border-radius: 4px; background: var(--accent); }
-.brand-mark span:nth-child(1), .brand-mark span:nth-child(4) { height: 9px; opacity: .7; }
-.brand-mark span:nth-child(2) { height: 17px; }
-.brand-mark span:nth-child(3) { height: 13px; }
-.session-label { color: var(--muted); font-size: 14px; letter-spacing: .1px; }
+.brand { display: inline-flex; min-height: 44px; align-items: center; gap: 12px; border-radius: 3px; }
+/* Frame the supplied image's symbol and wordmark side by side without altering the asset. */
+.brand-symbol, .brand-wordmark { position: relative; display: block; flex-shrink: 0; overflow: hidden; }
+.brand-symbol { width: 35px; height: 40.5px; }
+.brand-wordmark { width: 186.25px; height: 21.5px; }
+.brand img { position: absolute; max-width: none; height: auto; filter: invert(1); mix-blend-mode: screen; }
+.brand-symbol img { width: 100px; left: -32.5px; top: -19px; }
+.brand-wordmark img { width: 250px; left: -31.875px; top: -170.25px; }
 .studio { width: min(100%, 920px); margin: 0 auto; padding: 28px 32px 36px; }
 .step-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; background: #18151d; }
 .step-link { display: flex; min-height: 48px; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 4px; color: #b6acbf; font-size: 15px; line-height: 1.4; transition: color .16s, background .16s, box-shadow .16s; }
@@ -236,8 +236,6 @@ h2 { margin: 0; font-size: 22px; font-weight: 550; letter-spacing: -.5px; }
 
 @media (max-width: 640px) {
   .topbar { min-height: 70px; padding: 0 20px; }
-  .brand { font-size: 23px; }
-  .session-label { font-size: 14px; }
   .studio { padding: 20px 20px 28px; }
   .step-nav { gap: 3px; padding: 3px; }
   .step-link { align-items: flex-start; flex-direction: column; justify-content: flex-start; gap: 5px; padding: 10px 8px; font-size: 14px; line-height: 1.4; }
