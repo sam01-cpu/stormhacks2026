@@ -64,14 +64,18 @@ h1 { margin: 13px 0 13px; font-size: clamp(34px, 4.2vw, 48px); font-weight: 500;
 .instrument-range > span { padding: 0 6px; color: #667062; }
 .keyboard { position: relative; height: 224px; border-bottom: 5px solid #737b6f; }
 .keyboard button { touch-action: none; user-select: none; }
+.keyboard kbd { display: grid; width: 22px; height: 22px; flex-shrink: 0; place-items: center; border: 1px solid; border-radius: 3px; font-weight: 500; line-height: 1; }
 .white-keys { display: flex; height: 100%; }
 .white-key { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; padding: 0 0 15px; border: 0; border-right: 1px solid #adb4a8; color: #3e4938; background: linear-gradient(90deg, #e0e2dc, #f7f7f2 10%, #f1f2ec 78%, #dbddd6); box-shadow: inset 0 -4px 0 #c5c8c1; transition: background .12s; }
 .white-key:last-child { border-right: 0; }
 .white-key > span { font-size: 24px; font-weight: 600; }
-.white-key kbd { font-family: var(--font-geist-mono), monospace; color: #727d6b; font-size: 13px; }
+.white-key kbd { border-color: #a0aa98; background: rgb(255 255 255 / 35%); font-family: var(--font-geist-mono), monospace; color: #596650; font-size: 13px; }
+.white-key.is-selected kbd { border-color: #7f9d66; color: #345322; }
 .white-key:hover { background: #e0ecd5; }
 .white-key.is-selected { background: linear-gradient(90deg, #b5d293, #dcf4c3 12%, #cce8ad 78%, #a9c58c); box-shadow: inset 0 -4px 0 #8dab70; color: #345322; }
-.black-key { position: absolute; z-index: 1; top: 0; display: flex; width: 8.3%; height: 61%; align-items: flex-end; justify-content: center; padding: 0 0 13px; transform: translateX(-50%); border: 1px solid #080a09; border-top: 0; border-radius: 0 0 5px 5px; background: linear-gradient(90deg, #383c39, #222624 10%, #0a0c0b 72%, #282d29); color: #9ca598; box-shadow: 2px 5px 7px rgb(0 0 0 / 48%), inset 0 -5px 0 rgb(255 255 255 / 4%); font-size: 14px; }
+.black-key { position: absolute; z-index: 1; top: 0; display: flex; width: 8.3%; height: 61%; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; padding: 0 0 13px; transform: translateX(-50%); border: 1px solid #080a09; border-top: 0; border-radius: 0 0 5px 5px; background: linear-gradient(90deg, #383c39, #222624 10%, #0a0c0b 72%, #282d29); color: #9ca598; box-shadow: 2px 5px 7px rgb(0 0 0 / 48%), inset 0 -5px 0 rgb(255 255 255 / 4%); font-size: 14px; }
+.black-key kbd { border-color: #65735e; background: rgb(255 255 255 / 6%); font-family: var(--font-geist-mono), monospace; color: #c9d4c3; font-size: 13px; }
+.black-key.is-selected kbd { border-color: #a2c587; color: #e0f7ce; }
 .black-key:hover { background: #36422f; }
 .black-key.is-selected { background: linear-gradient(90deg, #638744, #344d25 65%, #55713e); color: #e0f7ce; }
 .keyboard button:focus-visible { outline-offset: -5px; }

@@ -5,6 +5,7 @@ import { blackNotes, whiteNotes } from "@/lib/music";
 import { useStudio } from "./studio-provider";
 
 const bindings: Record<string, string> = { KeyA: "C", KeyW: "C#", KeyS: "D", KeyE: "D#", KeyD: "E", KeyF: "F", KeyT: "F#", KeyG: "G", KeyY: "G#", KeyH: "A", KeyU: "A#", KeyJ: "B" };
+const keyLabels = Object.fromEntries(Object.entries(bindings).map(([code, note]) => [note, code.slice(3)]));
 
 export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
   const { selectedNotes, setSelectedNotes, hear, startNote } = useStudio();
@@ -100,8 +101,8 @@ export function Piano({ activeNotes = [] }: { activeNotes?: string[] }) {
     <section className="instrument" aria-label="Interactive one-octave piano">
       <div className="instrument-toolbar"><span className="instrument-name"><span className="status-dot" />Piano</span><span className="instrument-range">C4–B4 <span> / </span> One octave</span></div>
       <div className="keyboard">
-        <div className="white-keys">{whiteNotes.map((note, index) => <button type="button" className={`white-key${selected(note) ? " is-selected" : ""}`} key={note} aria-label={`Play ${note}4`} aria-pressed={selected(note)} {...keyEvents(note)}><span>{note}</span><kbd>{["A", "S", "D", "F", "G", "H", "J"][index]}</kbd></button>)}</div>
-        {blackNotes.map(({ note, after }) => <button type="button" className={`black-key${selected(note) ? " is-selected" : ""}`} key={note} style={{ left: `${((after + 1) / 7) * 100}%` }} aria-label={`Play ${note}4`} aria-pressed={selected(note)} {...keyEvents(note)}><span>{note}</span></button>)}
+        <div className="white-keys">{whiteNotes.map((note) => <button type="button" className={`white-key${selected(note) ? " is-selected" : ""}`} key={note} aria-label={`Play ${note}4`} aria-keyshortcuts={keyLabels[note]} aria-pressed={selected(note)} {...keyEvents(note)}><span>{note}</span><kbd>{keyLabels[note]}</kbd></button>)}</div>
+        {blackNotes.map(({ note, after }) => <button type="button" className={`black-key${selected(note) ? " is-selected" : ""}`} key={note} style={{ left: `${((after + 1) / 7) * 100}%` }} aria-label={`Play ${note}4`} aria-keyshortcuts={keyLabels[note]} aria-pressed={selected(note)} {...keyEvents(note)}><span>{note}</span><kbd>{keyLabels[note]}</kbd></button>)}
       </div>
       <div className="piano-footer"><span>Click to build a chord. Hold <kbd>A</kbd> + <kbd>D</kbd> + <kbd>G</kbd> for C major.</span><button className="text-button" onClick={() => { releaseAll(); setSelectedNotes([]); void hear([]); }} disabled={!selectedNotes.length}>Clear notes</button></div>
     </section>
