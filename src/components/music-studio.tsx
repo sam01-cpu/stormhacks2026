@@ -81,17 +81,18 @@ export function MusicStudio({ stage }: { stage: Stage }) {
         <div className="stage-content" key={stage}>
           <div className="stage-heading"><span className="eyebrow">STEP 0{stepIndex + 1} / 03</span><h1>{copy[stage].title}</h1></div>
           <GuidedLesson stage={stage} playing={playing} />
-          <Piano activeNotes={activeNotes} />
-          {error && <p className="audio-error" role="alert">{error}</p>}
-          {stage === "keys" && <KeysLesson />}
-          {stage === "chords" && <ProgressionBuilder />}
-          {stage === "loop" && <section className="loop-section" aria-labelledby="loop-title">
-            <div className="section-heading"><h2 id="loop-title">Your loop</h2><Link className="text-link" href="/chords">Edit chords ↗</Link></div>
-            <PianoRoll playing={playing} position={position} editable />
-            <div className="transport"><button type="button" className="primary-button" disabled={starting || playing} onClick={() => void start()}><PlayIcon />{starting ? "Starting…" : "Play Loop"}</button><button type="button" className="secondary-button" disabled={!playing && !starting} onClick={stop}><PlayIcon stop />Stop</button><label className="tempo-control" htmlFor="tempo"><span>Tempo <strong>{tempo}</strong> BPM</span><input id="tempo" type="range" min="50" max="160" value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><small>{playing && appliedTempo !== tempo ? "Applies at the next bar" : "4/4 · Four beats per bar"}</small></label><span className="beat-readout">{playing ? `Bar ${Math.floor(position) + 1} · Beat ${Math.floor((position % 1) * 4) + 1}` : "4 bars · Ready"}</span></div>
-            <p className="loop-hint">Change a chord above to hear it the next time that bar plays.</p>
-            <LoopExplanation activeBar={playing ? Math.floor(position) : null} />
-          </section>}
+          <div className="music-workspace">
+            <div className="piano-workspace"><Piano activeNotes={activeNotes} />{error && <p className="audio-error" role="alert">{error}</p>}</div>
+            {stage === "keys" && <KeysLesson />}
+            {stage === "chords" && <ProgressionBuilder />}
+            {stage === "loop" && <section className="loop-section" aria-labelledby="loop-title">
+              <div className="section-heading"><h2 id="loop-title">Your loop</h2><Link className="text-link" href="/chords">Edit chords ↗</Link></div>
+              <div className={`transport${playing ? " is-playing" : ""}`}><button type="button" className="primary-button" disabled={starting || playing} onClick={() => void start()}><PlayIcon />{starting ? "Starting…" : "Play Loop"}</button><button type="button" className="secondary-button" disabled={!playing && !starting} onClick={stop}><PlayIcon stop />Stop</button><label className="tempo-control" htmlFor="tempo"><span>Tempo <strong>{tempo}</strong> BPM</span><input id="tempo" type="range" min="50" max="160" value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><small>{playing && appliedTempo !== tempo ? "Applies at the next bar" : "4/4 · Four beats per bar"}</small></label><span className="beat-readout">{playing ? `Bar ${Math.floor(position) + 1} · Beat ${Math.floor((position % 1) * 4) + 1}` : "4 bars · Ready"}</span></div>
+              <PianoRoll playing={playing} position={position} editable />
+              <p className="loop-hint">Change a chord above to hear it the next time that bar plays.</p>
+              <LoopExplanation activeBar={playing ? Math.floor(position) : null} />
+            </section>}
+          </div>
           <footer className="stage-navigation">{stepIndex > 0 ? <Link className="back-link" href={steps[stepIndex - 1].href}>← {stepIndex === 1 ? "Learn the keys" : "Build a progression"}</Link> : <span className="footer-hint">No rules to memorize. Just start playing.</span>}{stepIndex < 2 ? <Link className="primary-button" href={steps[stepIndex + 1].href}>{stepIndex === 0 ? "Build a progression" : "Make it loop"}<span aria-hidden="true">→</span></Link> : <span className="footer-hint">You made music. Keep experimenting.</span>}</footer>
         </div>
       </main>
