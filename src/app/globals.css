@@ -161,19 +161,36 @@ h2 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
 .explain-numerals .numeral-sequence { margin: 12px 0; color: var(--accent); font-family: var(--font-geist-mono), monospace; font-size: 20px; }
 .explain-numerals .numeral-guide { color: #ded0ee; font-family: var(--font-geist-mono), monospace; font-size: 14px; }
 .explain-listening-tip { margin: 20px 0 0; color: #baadc8; font-size: 15px; line-height: 1.65; }
-.piano-roll { display: grid; grid-template-columns: 30px minmax(0, 1fr); height: 196px; }
-.pitch-labels { display: grid; grid-template-rows: repeat(7, 1fr); padding-top: 32px; color: #c0aece; font-size: 13px; }
-.pitch-labels span { display: flex; align-items: center; }
+.roll-view { --roll-header: 64px; --roll-row: 24px; margin: 0; }
+.roll-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; margin-bottom: 14px; }
+.roll-heading h3 { margin: 0; color: #e7dcf2; font-size: 19px; font-weight: 500; letter-spacing: -.4px; }
+.roll-heading > span { color: #baadc8; font-size: 14px; }
+.roll-axis-hints { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: #c0aece; font-size: 13px; }
+.piano-roll { display: grid; grid-template-columns: 44px minmax(0, 1fr); height: calc(var(--roll-header) + 12 * var(--roll-row)); }
+.pitch-labels { display: grid; grid-template-rows: repeat(12, minmax(0, 1fr)); padding-top: calc(var(--roll-header) + 1px); padding-bottom: 1px; color: #d5c3e5; font-family: var(--font-geist-mono), monospace; font-size: 12px; }
+.pitch-labels span { display: flex; align-items: center; padding-left: 3px; border-bottom: 1px solid rgb(255 255 255 / 5%); }
+.pitch-labels .is-black { background: rgb(0 0 0 / 17%); color: #a99cb5; }
 .roll-grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: hidden; border: 1px solid #494150; border-radius: 5px; background: #19141f; }
-.roll-column { position: relative; border-right: 1px solid #44334f; background: linear-gradient(to bottom, transparent calc(100% - 1px), rgb(255 255 255 / 7%) 100%) 0 32px / 100% calc((100% - 32px) / 7); }
+.roll-column { display: grid; min-width: 0; grid-template-rows: var(--roll-header) minmax(0, 1fr); border-right: 1px solid #716080; }
 .roll-column:last-of-type { border-right: 0; }
-.roll-column.is-playing { background-color: rgb(197 163 255 / 5%); }
-.roll-bar-name { display: flex; height: 32px; align-items: center; justify-content: space-between; padding: 0 10px; border-bottom: 1px solid #44334f; color: #b09cc2; font-family: var(--font-geist-mono), monospace; font-size: 13px; }
-.roll-bar-name strong { color: #e3d4f0; font-weight: 500; }
-.roll-chord-select { min-width: 0; max-width: calc(100% - 20px); border: 0; background: transparent; color: #e3d4f0; font: inherit; cursor: pointer; }
+.roll-column.is-playing { background-color: rgb(197 163 255 / 9%); }
+.roll-bar-name { display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 6px 10px; border-bottom: 1px solid #59476a; background: rgb(197 163 255 / 4%); color: #bca7ce; }
+.roll-bar-name > span { font-family: var(--font-geist-mono), monospace; font-size: 11px; letter-spacing: .5px; }
+.roll-bar-name strong { display: flex; min-height: 36px; align-items: center; color: #e3d4f0; font-size: 18px; font-weight: 500; }
+.roll-column.is-playing .roll-bar-name { background: rgb(197 163 255 / 14%); color: #e7d2ff; }
+.roll-chord-select { width: 100%; min-width: 0; min-height: 36px; padding: 0; border: 0; background: transparent; color: #e3d4f0; font-size: 18px; font-weight: 500; cursor: pointer; }
 .roll-chord-select option { background: #211a28; color: var(--foreground); }
-.roll-note { position: absolute; top: calc(32px + var(--row) * ((100% - 32px) / 7) + 3px); left: 5px; display: flex; width: calc(100% - 10px); height: calc((100% - 32px) / 7 - 6px); align-items: center; padding-left: 7px; border: 1px solid #9472b6; border-radius: 3px; background: #574071; color: #efdcff; font-size: 12px; }
+.roll-notes { display: grid; min-height: 0; grid-template-rows: repeat(12, minmax(0, 1fr)); }
+.roll-lane { min-height: 0; border-bottom: 1px solid rgb(255 255 255 / 8%); background: linear-gradient(to right, transparent calc(100% - 1px), rgb(255 255 255 / 5%) 100%) 0 0 / 25% 100%; }
+.roll-lane.is-black { background-color: rgb(0 0 0 / 20%); }
+.roll-note { display: flex; height: calc(100% - 5px); align-items: center; margin: 2px 4px 3px; padding-left: 6px; border: 1px solid #a785ce; border-radius: 3px; background: #574071; color: #efdcff; font-size: 13px; line-height: 1; }
+.roll-column.is-playing .roll-note { border-color: #ddc4ff; background: #8862b5; color: #fcf8ff; }
 .playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #e7d2ff; box-shadow: 0 0 12px rgb(197 163 255 / 50%); pointer-events: none; }
+.roll-beat-ruler { display: grid; grid-template-columns: 44px minmax(0, 1fr); margin-top: 8px; color: #b6a6c4; font-family: var(--font-geist-mono), monospace; font-size: 12px; }
+.roll-beat-ruler > div { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); }
+.roll-beat-ruler > div > span { padding-left: 5px; }
+.roll-beat-ruler > div > span:nth-child(4n+1) { color: #e0c9f8; }
+.roll-view figcaption { margin-top: 14px; color: #c0aece; font-size: 16px; line-height: 1.6; }
 .transport { display: flex; align-items: center; gap: 24px; margin-top: 20px; }
 .tempo-control { display: flex; flex: 1; max-width: 240px; flex-direction: column; gap: 8px; color: #c8b9d5; font-size: 15px; }
 .tempo-control strong { padding: 0 4px; color: #f5ecfc; font-size: 18px; font-weight: 500; }
@@ -216,8 +233,13 @@ h2 { margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
   .transport .primary-button { padding: 12px 16px; }
   .tempo-control { min-width: 120px; }
   .beat-readout { width: 100%; margin: 0; }
-  .piano-roll { height: 194px; }
-  .roll-bar-name { padding: 0 5px; font-size: 11px; }
+  .roll-view { --roll-row: 22px; }
+  .roll-bar-name { padding: 6px 5px; }
+  .roll-bar-name strong, .roll-chord-select { font-size: 16px; }
+  .roll-bar-name > span { font-size: 10px; letter-spacing: 0; }
+  .roll-heading h3 { font-size: 18px; }
+  .roll-axis-hints { font-size: 12px; }
+  .roll-note { margin-right: 3px; margin-left: 3px; padding-left: 4px; font-size: 12px; }
   .loop-explanation > summary { gap: 10px; padding: 16px; }
   .explain-title { font-size: 19px; }
   .explain-context { display: none; }

@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { type CSSProperties } from "react";
-import { chords, getChord, whiteNotes } from "@/lib/music";
+import { chords, getChord } from "@/lib/music";
 import { useStudio } from "./studio-provider";
 import { useLoopPlayback } from "./use-loop-playback";
 import { Piano } from "./piano";
 import { ChordFeedback } from "./chord-feedback";
 import { GuidedLesson } from "./guided-lesson";
 import { LoopExplanation } from "./loop-explanation";
+import { PianoRoll } from "./piano-roll";
 
 type Stage = "keys" | "chords" | "loop";
 const steps: { id: Stage; label: string; href: string }[] = [
@@ -64,22 +64,7 @@ function ProgressionBuilder() {
           );
         })}
       </div>
-      <LoopExplanation />
     </section>
-  );
-}
-
-function PianoRoll({ playing, position }: { playing: boolean; position: number }) {
-  const { progression, setProgression } = useStudio();
-  const rows = [...whiteNotes].reverse();
-  return (
-    <div className="piano-roll" role="group" aria-label={`Piano roll: ${progression.map((id) => getChord(id).name).join(", ")}. Each chord lasts one bar.`}>
-      <div className="pitch-labels" aria-hidden="true">{rows.map((note) => <span key={note}>{note}</span>)}</div>
-      <div className="roll-grid">
-        {progression.map((id, index) => <div className={`roll-column${playing && Math.floor(position) === index ? " is-playing" : ""}`} key={index}><div className="roll-bar-name"><span aria-hidden="true">0{index + 1}</span><select className="roll-chord-select" aria-label={`Chord for bar ${index + 1}`} title={getChord(id).name} value={id} onChange={(event) => setProgression(progression.map((old, bar) => bar === index ? event.target.value : old))}>{chords.map((chord) => <option key={chord.id} value={chord.id} aria-label={chord.name}>{chord.id}</option>)}</select></div>{getChord(id).notes.map((note) => <span key={note} className="roll-note" aria-hidden="true" style={{ "--row": rows.indexOf(note) } as CSSProperties}>{note}</span>)}</div>)}
-        {playing && <span className="playhead" aria-hidden="true" style={{ left: `${position * 25}%` }} />}
-      </div>
-    </div>
   );
 }
 
@@ -102,9 +87,9 @@ export function MusicStudio({ stage }: { stage: Stage }) {
           {stage === "chords" && <ProgressionBuilder />}
           {stage === "loop" && <section className="loop-section" aria-labelledby="loop-title">
             <div className="section-heading"><h2 id="loop-title">Your loop</h2><Link className="text-link" href="/chords">Edit chords ↗</Link></div>
-            <PianoRoll playing={playing} position={position} />
+            <PianoRoll playing={playing} position={position} editable />
             <div className="transport"><button type="button" className="primary-button" disabled={starting || playing} onClick={() => void start()}><PlayIcon />{starting ? "Starting…" : "Play Loop"}</button><button type="button" className="secondary-button" disabled={!playing && !starting} onClick={stop}><PlayIcon stop />Stop</button><label className="tempo-control" htmlFor="tempo"><span>Tempo <strong>{tempo}</strong> BPM</span><input id="tempo" type="range" min="50" max="160" value={tempo} onChange={(event) => setTempo(Number(event.target.value))} /><small>{playing && appliedTempo !== tempo ? "Applies at the next bar" : "4/4 · Four beats per bar"}</small></label><span className="beat-readout">{playing ? `Bar ${Math.floor(position) + 1} · Beat ${Math.floor((position % 1) * 4) + 1}` : "4 bars · Ready"}</span></div>
-            <p className="loop-hint">Each block is a note; stacked notes play together. Change a chord above to hear it the next time that bar plays.</p>
+            <p className="loop-hint">Change a chord above to hear it the next time that bar plays.</p>
             <LoopExplanation activeBar={playing ? Math.floor(position) : null} />
           </section>}
           <footer className="stage-navigation">{stepIndex > 0 ? <Link className="back-link" href={steps[stepIndex - 1].href}>← {stepIndex === 1 ? "Learn the keys" : "Build a progression"}</Link> : <span className="footer-hint">No rules to memorize. Just start playing.</span>}{stepIndex < 2 ? <Link className="primary-button" href={steps[stepIndex + 1].href}>{stepIndex === 0 ? "Build a progression" : "Make it loop"}<span aria-hidden="true">→</span></Link> : <span className="footer-hint">You made music. Keep experimenting.</span>}</footer>

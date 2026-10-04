@@ -52,7 +52,7 @@ export function explainProgression(progression: readonly string[]) {
   };
 }
 
-const pitchNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+export const pitchNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const triadPatterns = [
   { quality: "major", intervals: [0, 4, 7], sound: "bright, settled" },
   { quality: "minor", intervals: [0, 3, 7], sound: "softer, darker" },
